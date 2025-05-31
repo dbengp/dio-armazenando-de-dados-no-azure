@@ -108,19 +108,51 @@ echo "Chave de Armazenamento (para uso em sua aplicação): $STORAGE_KEY"
 
 ### Aplicação REST Simples em Python com Flask
 - A aplicação Python usará o Flask para criar a API REST, pyodbc para conectar ao SQL Server e azure-storage-blob para interagir com o Azure Storage. Pré-requisitos: Python 3.x instalado, instale os pacotes necessários: `pip install Flask pyodbc azure-storage-blob`
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Estrutura do Banco de Dados SQL Server consta de uma tabela Produtos com as seguintes colunas:
+```
+ Coluna        Tipo SQL         Descrição
+ ProdutoID     INT	        Chave primária, identidade
+ Nome	       NVARCHAR(255)	Nome do produto
+ Tipo	       NVARCHAR(255)	Tipo do produto (fruta, verdura, legume, etc.)
+ Preco	       DECIMAL(10, 2) 	Preço do produto
+ Origem	       NVARCHAR(255)    País/região de origem
+ Fornecedor    NVARCHAR(255)	Nome do fornecedor
+ Estoque       INT	        Quantidade em estoque
+ ImagemUrl     NVARCHAR(MAX)    URL do blob da imagem do produto no Azure Storage
+```
+- Como executar:
+ * Variáveis de Ambiente: configurei no terminal antes de rodar a aplicação:
+ ```
+ export DB_SERVER="quitandaonlinesqlserver.database.windows.net"
+ export DB_DATABASE="QuitandaProdutosDB"
+ export DB_USERNAME="quitandaadmin"
+ export DB_PASSWORD="SuaSenhaSegura!123"
+ export STORAGE_ACCOUNT_NAME="quitandaonlineimages"
+ export STORAGE_ACCOUNT_KEY="SUA_CHAVE_DE_ARMAZENAMENTO_AQUI"
+ ```
+ * Execute a aplicação: `python app.py` , que estará rodando em http://127.0.0.1:5000 (ou http://0.0.0.0:5000 se você usar host='0.0.0.0').
+ * Testando a API (usando curl ou Postman/Insomnia):
+   * Criar um Produto (POST): Envie um JSON para /produtos com a imagem codificada em Base64.
+   ```
+   curl -X POST -H "Content-Type: application/json" -d '{
+    "Nome": "Maçã Gala",
+    "Tipo": "Fruta",
+    "Preco": 5.99,
+    "Origem": "Brasil",
+    "Fornecedor": "Fazenda Feliz",
+    "Estoque": 100, 
+    "ImagemBase64": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="}'
+    http://127.0.0.1:5000/produtos 
+   ```
+   * Obter todos os produtos: `curl http://127.0.0.1:5000/produtos`
+   * Atualizar um Produto (PUT)
+   ```
+   curl -X PUT -H "Content-Type: application/json" -d '{ 
+    "Preco": 6.50, 
+    "Estoque": 90}'
+    http://127.0.0.1:5000/produtos/1
+   ```
+   * Deletar um Produto (DELETE): `curl -X DELETE http://127.0.0.1:5000/produtos/1`
 
 
 
